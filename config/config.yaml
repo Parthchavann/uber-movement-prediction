@@ -5,7 +5,7 @@ data:
   sample_cities: ["san_francisco", "new_york", "london"]
 
 spark:
-  app_name: "UberMovementPrediction"
+  app_name: "UberFlowAnalytics"
   master: "local[*]"
   executor_memory: "4g"
   driver_memory: "2g"

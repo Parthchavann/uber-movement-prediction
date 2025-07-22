@@ -235,7 +235,7 @@ async def lifespan(app: FastAPI):
 
 # Create FastAPI app
 app = FastAPI(
-    title="Traffic Speed Prediction API",
+    title="UberFlow Analytics API",
     description="Real-time traffic speed prediction using LSTM and GNN models",
     version="1.0.0",
     lifespan=lifespan

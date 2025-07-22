@@ -91,7 +91,7 @@ const Header: React.FC<HeaderProps> = ({
                 mr: 3,
               }}
             >
-              🌊 FlowCast AI
+              🌊 UberFlow Analytics
             </Typography>
             
             <FormControl 

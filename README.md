@@ -1,6 +1,6 @@
-# Uber Movement Data: Traffic Speed Prediction
+# UberFlow Analytics: Traffic Speed Prediction Platform
 
-A comprehensive end-to-end machine learning project for predicting traffic speeds using Uber Movement data, featuring LSTM and Graph Neural Network models with real-time prediction capabilities.
+UberFlow Analytics is a comprehensive end-to-end machine learning platform for predicting traffic speeds using Uber Movement data, featuring LSTM and Graph Neural Network models with real-time prediction capabilities.
 
 ![Traffic Prediction](https://img.shields.io/badge/Status-Production%20Ready-green)
 ![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
@@ -8,7 +8,7 @@ A comprehensive end-to-end machine learning project for predicting traffic speed
 
 ## 🚀 Project Overview
 
-This project implements a production-ready traffic speed prediction system using:
+UberFlow Analytics implements a production-ready traffic speed prediction system using:
 
 - **LSTM Neural Networks** for temporal pattern recognition
 - **Graph Neural Networks** for spatial relationship modeling  
@@ -351,7 +351,7 @@ models:
     epochs: 200
 
 spark:
-  app_name: "UberMovementPrediction"
+  app_name: "UberFlowAnalytics"
   master: "local[*]"
   executor_memory: "4g"
   driver_memory: "2g"
