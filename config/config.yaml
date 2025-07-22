@@ -1,0 +1,44 @@
+data:
+  raw_data_path: "data/raw/"
+  processed_data_path: "data/processed/"
+  uber_movement_url: "https://movement.uber.com/explore"
+  sample_cities: ["san_francisco", "new_york", "london"]
+
+spark:
+  app_name: "UberMovementPrediction"
+  master: "local[*]"
+  executor_memory: "4g"
+  driver_memory: "2g"
+
+models:
+  lstm:
+    sequence_length: 24
+    hidden_size: 128
+    num_layers: 2
+    dropout: 0.2
+    learning_rate: 0.001
+    batch_size: 32
+    epochs: 100
+    
+  gnn:
+    hidden_channels: 64
+    num_layers: 3
+    dropout: 0.1
+    learning_rate: 0.001
+    batch_size: 16
+    epochs: 200
+
+visualization:
+  map_center: [37.7749, -122.4194]  # San Francisco
+  default_zoom: 11
+  tile_layer: "OpenStreetMap"
+
+api:
+  host: "0.0.0.0"
+  port: 8000
+  workers: 4
+
+airflow:
+  dag_schedule: "0 */6 * * *"  # Every 6 hours
+  retries: 3
+  retry_delay: 300  # 5 minutes

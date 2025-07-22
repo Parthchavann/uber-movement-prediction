@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlowCast AI - React Dashboard Preview</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #0a0e27;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+        
+        .app-container {
+            min-height: 100vh;
+            display: flex;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 240px;
+            background: #111633;
+            padding: 2rem 0;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .logo {
+            padding: 0 2rem 2rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00bcd4;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .nav-item {
+            padding: 1rem 2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .nav-item:hover {
+            background: rgba(0, 188, 212, 0.1);
+            color: #00bcd4;
+            border-right: 3px solid #00bcd4;
+        }
+        
+        .nav-item.active {
+            background: rgba(0, 188, 212, 0.15);
+            color: #00bcd4;
+            border-right: 3px solid #00bcd4;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Header */
+        .header {
+            background: #111633;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .header-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .theme-toggle {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Dashboard Content */
+        .dashboard-content {
+            padding: 2rem;
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        /* Metric Cards */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .metric-card {
+            background: linear-gradient(145deg, rgba(26, 29, 58, 0.9), rgba(26, 29, 58, 0.7));
+            border: 1px solid rgba(0, 188, 212, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 188, 212, 0.15);
+            border-color: rgba(0, 188, 212, 0.4);
+        }
+        
+        .metric-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(0, 188, 212, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            color: #00bcd4;
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #00bcd4, #33c9dc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+        
+        .metric-change {
+            display: inline-block;
+            margin-top: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .metric-change.positive {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+        }
+        
+        .metric-change.negative {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+        }
+        
+        /* Charts Section */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .chart-card {
+            background: rgba(26, 29, 58, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+        
+        .chart-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        /* Map Container */
+        .map-container {
+            background: rgba(26, 29, 58, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                🚗 FlowCast AI
+            </div>
+            <div class="nav-item active">
+                📊 Dashboard
+            </div>
+            <div class="nav-item">
+                🗺️ Traffic Map
+            </div>
+            <div class="nav-item">
+                🔮 Predictions
+            </div>
+            <div class="nav-item">
+                📈 Analytics
+            </div>
+            <div class="nav-item">
+                ⚙️ Settings
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <div class="header-title">Traffic Analytics Dashboard</div>
+                <div class="header-actions">
+                    <button class="theme-toggle">🌙 Dark Mode</button>
+                    <div style="color: rgba(255, 255, 255, 0.7);">
+                        Last updated: <span id="lastUpdate">Just now</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <!-- Metrics Grid -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-icon">🚗</div>
+                        <div class="metric-value">27.5</div>
+                        <div class="metric-label">Average Speed (mph)</div>
+                        <span class="metric-change positive">↑ 2.4%</span>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-icon">🛣️</div>
+                        <div class="metric-value">6</div>
+                        <div class="metric-label">Active Segments</div>
+                        <span class="metric-change negative">↓ 1.2%</span>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-icon">📊</div>
+                        <div class="metric-value">1,847</div>
+                        <div class="metric-label">Predictions Today</div>
+                        <span class="metric-change positive">↑ 15.8%</span>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-icon">🎯</div>
+                        <div class="metric-value">89.2%</div>
+                        <div class="metric-label">Model Accuracy</div>
+                        <span class="metric-change positive">↑ 0.3%</span>
+                    </div>
+                </div>
+                
+                <!-- Charts Section -->
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <div class="chart-title">Real-Time Traffic Speed</div>
+                        <div style="height: 300px; display: flex; align-items: center; justify-content: center; color: rgba(255, 255, 255, 0.5);">
+                            <canvas id="speedChart" style="width: 100%; height: 100%;"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <div class="chart-title">System Status</div>
+                        <div style="padding: 1rem;">
+                            <div style="margin-bottom: 1rem;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                    <span>API Status</span>
+                                    <span style="color: #4caf50;">✓ Healthy</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                    <span>Models Loaded</span>
+                                    <span style="color: #00bcd4;">2/2</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                    <span>Data Pipeline</span>
+                                    <span style="color: #4caf50;">Active</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Last Update</span>
+                                    <span style="color: rgba(255, 255, 255, 0.7);">2 min ago</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Map -->
+                <div class="map-container">
+                    <div style="text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">🗺️</div>
+                        <div>Interactive Traffic Map</div>
+                        <div style="font-size: 0.9rem; margin-top: 0.5rem;">
+                            Real-time traffic visualization with Leaflet/Mapbox integration
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Simulate real-time chart
+        const canvas = document.getElementById('speedChart');
+        const ctx = canvas.getContext('2d');
+        
+        function drawChart() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = '#00bcd4';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            
+            for (let i = 0; i < 50; i++) {
+                const x = (canvas.width / 50) * i;
+                const y = canvas.height / 2 + Math.sin(i * 0.2 + Date.now() * 0.001) * 50;
+                
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+            
+            ctx.stroke();
+        }
+        
+        // Resize canvas
+        function resizeCanvas() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+        }
+        
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Animate chart
+        setInterval(drawChart, 50);
+        
+        // Update time
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('lastUpdate').textContent = now.toLocaleTimeString();
+        }, 1000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlowCast AI - Traffic Prediction Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: #7f8c8d;
+            margin-top: 0.5rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.18);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .predictions-container {
+            margin: 2rem 0;
+        }
+
+        .prediction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #27ae60;
+        }
+
+        .prediction-speed {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #27ae60;
+        }
+
+        .confidence-range {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+
+        .api-status {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status-healthy {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .refresh-btn {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .loading {
+            text-align: center;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+            }
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚗 FlowCast AI Dashboard</h1>
+        <p class="subtitle">Real-time Traffic Speed Prediction System</p>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <h2>System Status</h2>
+            <p>API Status: <span class="api-status status-healthy" id="apiStatus">Checking...</span></p>
+            <button class="refresh-btn" onclick="refreshData()">🔄 Refresh Data</button>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="avgSpeed">--</div>
+                <div class="stat-label">Average Speed (mph)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="modelAccuracy">89%</div>
+                <div class="stat-label">GNN Model Accuracy</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalSegments">6</div>
+                <div class="stat-label">Road Segments</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalPredictions">--</div>
+                <div class="stat-label">Active Predictions</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🔮 Latest Traffic Predictions</h2>
+            <div class="predictions-container" id="predictionsContainer">
+                <p class="loading">Loading predictions...</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🧠 Model Performance</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div>
+                    <h3>LSTM Model</h3>
+                    <p>MAE: 3.2 mph</p>
+                    <p>R²: 0.87</p>
+                    <p>Status: Active</p>
+                </div>
+                <div>
+                    <h3>GNN Model ⭐</h3>
+                    <p>MAE: 2.9 mph</p>
+                    <p>R²: 0.89</p>
+                    <p>Status: Selected</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8001';
+        let currentCity = 'all';
+        
+        async function checkAPIHealth() {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                document.getElementById('apiStatus').textContent = 'Healthy ✅';
+                return true;
+            } catch (error) {
+                document.getElementById('apiStatus').textContent = 'Offline ❌';
+                document.getElementById('apiStatus').className = 'api-status';
+                return false;
+            }
+        }
+        
+        async function loadCityData() {
+            try {
+                const response = await fetch(`${API_BASE}/cities`);
+                const cities = await response.json();
+                
+                // Update city selector
+                const selector = document.getElementById('citySelector');
+                if (selector) {
+                    selector.innerHTML = '<option value="all">All Cities</option>';
+                    cities.forEach(city => {
+                        selector.innerHTML += `<option value="${city.id}">${city.name}</option>`;
+                    });
+                }
+                
+                // Update total statistics
+                let totalRecords = 0;
+                let totalSegments = 0;
+                let avgSpeed = 0;
+                
+                cities.forEach(city => {
+                    totalRecords += city.traffic_records;
+                    totalSegments += city.segments;
+                    avgSpeed += city.avg_speed;
+                });
+                
+                avgSpeed = avgSpeed / cities.length;
+                
+                document.getElementById('totalRecords').textContent = totalRecords.toLocaleString();
+                document.getElementById('totalSegments').textContent = totalSegments;
+                document.getElementById('avgSpeed').textContent = avgSpeed.toFixed(1);
+                
+                return cities;
+            } catch (error) {
+                console.error('Error loading city data:', error);
+                return [];
+            }
+        }
+        
+        async function loadPredictions() {
+            try {
+                const response = await fetch(`${API_BASE}/predictions`);
+                const predictions = await response.json();
+                
+                const container = document.getElementById('predictionsContainer');
+                container.innerHTML = '';
+                
+                // Calculate average speed
+                const speeds = predictions.map(p => p.predicted_speed);
+                const avgSpeed = (speeds.reduce((a, b) => a + b, 0) / speeds.length).toFixed(1);
+                document.getElementById('avgSpeed').textContent = avgSpeed;
+                document.getElementById('totalPredictions').textContent = predictions.length;
+                
+                // Display predictions
+                predictions.slice(0, 6).forEach(pred => {
+                    const item = document.createElement('div');
+                    item.className = 'prediction-item';
+                    
+                    const segmentNames = [
+                        'Highway 101 North', 'Market Street', 'Van Ness Avenue',
+                        'Mission Street', 'Lombard Street', 'Castro Street'
+                    ];
+                    
+                    item.innerHTML = `
+                        <div>
+                            <strong>${segmentNames[pred.segment_id] || `Segment ${pred.segment_id}`}</strong><br>
+                            <small>${new Date(pred.timestamp).toLocaleString()}</small>
+                        </div>
+                        <div>
+                            <div class="prediction-speed">${pred.predicted_speed} mph</div>
+                            <div class="confidence-range">${pred.confidence_lower}-${pred.confidence_upper} mph</div>
+                        </div>
+                    `;
+                    
+                    container.appendChild(item);
+                });
+                
+            } catch (error) {
+                document.getElementById('predictionsContainer').innerHTML = 
+                    '<p class="loading">❌ Unable to load predictions</p>';
+            }
+        }
+        
+        async function refreshData() {
+            const isHealthy = await checkAPIHealth();
+            if (isHealthy) {
+                await loadPredictions();
+            }
+        }
+        
+        // Initialize dashboard
+        refreshData();
+        
+        // Auto-refresh every 30 seconds
+        setInterval(refreshData, 30000);
+    </script>
+</body>
+</html>
