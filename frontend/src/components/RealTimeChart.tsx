@@ -167,15 +167,15 @@ const RealTimeChart: React.FC = () => {
   const generateMockData = () => {
     console.log('RealTimeChart: Generating mock data for timeRange:', timeRange);
     const now = new Date();
-    const hours = timeRange === '24h' ? 24 : timeRange === '7d' ? 168 : 12;
-    const interval = timeRange === '24h' ? 2 : timeRange === '7d' ? 6 : 1; // Every 2 hours for 24h view
+    const points = timeRange === '24h' ? 24 : timeRange === '7d' ? 168 : 12;
+    const interval = timeRange === '24h' ? 1 : timeRange === '7d' ? 4 : 0.5; // Every hour for 24h view
     
     const newData: DataPoint[] = [];
     
-    for (let i = hours; i >= 0; i -= interval) {
-      const time = new Date(now.getTime() - i * 60 * 60 * 1000);
+    for (let i = points; i >= 0; i -= 1) {
+      const time = new Date(now.getTime() - i * interval * 60 * 60 * 1000);
       const hour = time.getHours();
-      const isRushHour = hour >= 7 && hour <= 9 || hour >= 17 && hour <= 19;
+      const isRushHour = (hour >= 7 && hour <= 9) || (hour >= 17 && hour <= 19);
       
       // Base speed with rush hour and random variations
       let baseSpeed = 25;
@@ -191,14 +191,16 @@ const RealTimeChart: React.FC = () => {
               time.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
         speed: Math.round(speed * 10) / 10,
         prediction: Math.round(prediction * 10) / 10,
-        segment1: Math.max(5, Math.min(50, speed + (Math.random() - 0.5) * 6)),
-        segment2: Math.max(5, Math.min(50, speed + (Math.random() - 0.5) * 6)),
-        segment3: Math.max(5, Math.min(50, speed + (Math.random() - 0.5) * 6)),
+        segment1: Math.round(Math.max(5, Math.min(50, speed + (Math.random() - 0.5) * 6)) * 10) / 10,
+        segment2: Math.round(Math.max(5, Math.min(50, speed + (Math.random() - 0.5) * 6)) * 10) / 10,
+        segment3: Math.round(Math.max(5, Math.min(50, speed + (Math.random() - 0.5) * 6)) * 10) / 10,
         rush_hour: isRushHour,
       });
     }
     
-    setData(newData.slice(-50));
+    const finalData = newData.length > 50 ? newData.slice(-50) : newData;
+    console.log('RealTimeChart: Generated', finalData.length, 'data points:', finalData.slice(0, 3));
+    setData(finalData);
   };
 
   // Initial data load
@@ -423,6 +425,12 @@ const RealTimeChart: React.FC = () => {
                 <Typography variant="caption" color="text.secondary">
                   Current average speed
                 </Typography>
+                <Chip
+                  label={`${data.length} points`}
+                  size="small"
+                  variant="outlined"
+                  color="info"
+                />
               </Box>
             </Box>
             
@@ -469,21 +477,35 @@ const RealTimeChart: React.FC = () => {
             </Box>
           </Box>
           
-          <Box sx={{ flexGrow: 1, minHeight: 0 }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={chartType}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                  style={{ width: '100%', height: '100%' }}
-                >
-                  {renderChart()}
-                </motion.div>
-              </AnimatePresence>
-            </ResponsiveContainer>
+          <Box sx={{ flexGrow: 1, minHeight: 350, height: 350 }}>
+            {data.length === 0 ? (
+              <Box 
+                sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  height: '100%',
+                  color: 'text.secondary' 
+                }}
+              >
+                <Typography>Loading chart data...</Typography>
+              </Box>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={chartType}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    style={{ width: '100%', height: '100%' }}
+                  >
+                    {renderChart()}
+                  </motion.div>
+                </AnimatePresence>
+              </ResponsiveContainer>
+            )}
           </Box>
         </CardContent>
       </Card>
