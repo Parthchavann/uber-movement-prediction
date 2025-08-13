@@ -450,22 +450,22 @@ const TrafficMap: React.FC<TrafficMapProps> = ({ selectedCity = 'all' }) => {
         }
         
         // Convert predictions to segment format for map display
-        const segmentMap = new Map<string, any>();
+        const segmentObj: Record<string, any> = {};
         filteredPredictions.forEach((pred: any) => {
           const key = `${pred.city}_${pred.segment_id}`;
-          if (!segmentMap.has(key)) {
-            segmentMap.set(key, {
+          if (!segmentObj[key]) {
+            segmentObj[key] = {
               id: pred.segment_id,
               city: pred.city,
               speed: pred.predicted_speed,
               prediction: pred.predicted_speed * 1.05, // Slight variation for demo
               lat: pred.lat,
               lon: pred.lon,
-            });
+            };
           }
         });
         
-        setSegments(Array.from(segmentMap.values()).slice(0, 20)); // Limit for display
+        setSegments(Object.values(segmentObj).slice(0, 20)); // Limit for display
       }
     } catch (error) {
       console.error('TrafficMap: Error loading traffic data:', error);
