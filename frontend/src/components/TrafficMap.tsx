@@ -21,7 +21,7 @@ import {
   Divider,
 } from '@mui/material';
 import {
-  Map,
+  Map as MapIcon,
   Layers,
   LocationOn,
   Speed,
@@ -450,7 +450,7 @@ const TrafficMap: React.FC<TrafficMapProps> = ({ selectedCity = 'all' }) => {
         }
         
         // Convert predictions to segment format for map display
-        const segmentMap: Map<string, any> = new (Map as any)();
+        const segmentMap = new Map<string, any>();
         filteredPredictions.forEach((pred: any) => {
           const key = `${pred.city}_${pred.segment_id}`;
           if (!segmentMap.has(key)) {
