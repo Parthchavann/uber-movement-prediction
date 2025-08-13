@@ -31,9 +31,10 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "PORT=3001 react-scripts start",
-    "start:3000": "PORT=3000 react-scripts start",
-    "start:dev": "PORT=3001 BROWSER=none react-scripts start",
+    "start": "set PORT=3001 && react-scripts start",
+    "start:3000": "set PORT=3000 && react-scripts start",
+    "start:3003": "set PORT=3003 && set BROWSER=none && react-scripts start",
+    "start:dev": "set PORT=3001 && set BROWSER=none && react-scripts start",
     "build": "react-scripts build",
     "build:analyze": "npm run build && npx source-map-explorer 'build/static/js/*.js'",
     "test": "react-scripts test",

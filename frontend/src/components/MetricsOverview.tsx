@@ -177,7 +177,7 @@ const MetricsOverview: React.FC = () => {
           <Divider />
 
           <Grid container>
-            <Grid item xs={12} sm={6} md={4}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <MetricItem
                 label="Current Avg Speed"
                 value={metrics.realTimeSpeed.toFixed(1)}
@@ -186,7 +186,7 @@ const MetricsOverview: React.FC = () => {
                 color="primary"
               />
             </Grid>
-            <Grid item xs={12} sm={6} md={4}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <MetricItem
                 label="Daily Average"
                 value={metrics.avgDailySpeed.toFixed(1)}
@@ -195,7 +195,7 @@ const MetricsOverview: React.FC = () => {
                 color="secondary"
               />
             </Grid>
-            <Grid item xs={12} sm={6} md={4}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <MetricItem
                 label="Peak Hour Speed"
                 value={metrics.peakHourSpeed.toFixed(1)}
@@ -209,7 +209,7 @@ const MetricsOverview: React.FC = () => {
           <Divider />
 
           <Grid container>
-            <Grid item xs={12} sm={6} md={4}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <MetricItem
                 label="Predictions Made"
                 value={metrics.totalPredictions.toLocaleString()}
@@ -217,7 +217,7 @@ const MetricsOverview: React.FC = () => {
                 color="success"
               />
             </Grid>
-            <Grid item xs={12} sm={6} md={4}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <MetricItem
                 label="Active Segments"
                 value={metrics.activeSegments}
@@ -225,7 +225,7 @@ const MetricsOverview: React.FC = () => {
                 color="info"
               />
             </Grid>
-            <Grid item xs={12} sm={6} md={4}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <MetricItem
                 label="Response Time"
                 value={metrics.responseTime.toFixed(0)}
@@ -239,7 +239,7 @@ const MetricsOverview: React.FC = () => {
           <Divider />
 
           <Grid container>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <ProgressMetric
                 label="Model Accuracy"
                 value={89}
@@ -247,7 +247,7 @@ const MetricsOverview: React.FC = () => {
                 color="success"
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <ProgressMetric
                 label="System Load"
                 value={67}
@@ -264,7 +264,7 @@ const MetricsOverview: React.FC = () => {
               Model Performance
             </Typography>
             <Grid container spacing={2}>
-              <Grid item xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Box sx={{ textAlign: 'center', p: 2, borderRadius: 2, background: alpha(theme.palette.primary.main, 0.05) }}>
                   <ModelTraining sx={{ fontSize: 32, color: 'primary.main', mb: 1 }} />
                   <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main' }}>
@@ -275,7 +275,7 @@ const MetricsOverview: React.FC = () => {
                   </Typography>
                 </Box>
               </Grid>
-              <Grid item xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Box sx={{ textAlign: 'center', p: 2, borderRadius: 2, background: alpha(theme.palette.secondary.main, 0.05) }}>
                   <LocationOn sx={{ fontSize: 32, color: 'secondary.main', mb: 1 }} />
                   <Typography variant="h6" sx={{ fontWeight: 600, color: 'secondary.main' }}>

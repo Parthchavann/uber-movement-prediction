@@ -407,7 +407,7 @@ const PredictionPanel: React.FC<PredictionPanelProps> = ({ selectedCity = 'all' 
               
               <Grid container spacing={2}>
                 <Grid size={12}>
-                  <FormControl fullWidth size="small">
+                  <FormControl fullWidth size="small":
                     <InputLabel>Segment ID</InputLabel>
                     <Select
                       value={selectedSegment}

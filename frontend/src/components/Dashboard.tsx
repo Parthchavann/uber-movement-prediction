@@ -247,23 +247,104 @@ interface Prediction {
 }
 
 interface DashboardProps {
-  selectedCity: string;
+  selectedCity?: string;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ selectedCity }) => {
+const Dashboard: React.FC<DashboardProps> = ({ selectedCity = "san_francisco" }) => {
   const [metrics, setMetrics] = useState({
     avgSpeed: 20.2,
-    totalSegments: 600,
-    totalRecords: 432000,
+    totalSegments: 1050,
+    totalRecords: 737000,
     accuracy: 89.2,
   });
 
   const [isLoading, setIsLoading] = useState(true);
   const [cities, setCities] = useState<City[]>([]);
   const [predictions, setPredictions] = useState<Prediction[]>([]);
-  const [apiStatus, setApiStatus] = useState('checking');
+  const [apiStatus, setApiStatus] = useState('offline');
 
-  const API_BASE = 'http://localhost:8001';
+  const API_BASE = 'http://localhost:8002';
+
+  // Initialize with mock data
+  const initializeMockData = () => {
+    const mockCities: City[] = [
+      {
+        id: "san_francisco",
+        name: "San Francisco",
+        country: "USA",
+        center: [37.7749, -122.4194] as [number, number],
+        timezone: "America/Los_Angeles",
+        segments: 250,
+        traffic_records: 180000,
+        avg_speed: 24.5,
+        rush_hour_impact: -35.2,
+        status: "active"
+      },
+      {
+        id: "new_york", 
+        name: "New York",
+        country: "USA",
+        center: [40.7128, -74.0060] as [number, number],
+        timezone: "America/New_York",
+        segments: 420,
+        traffic_records: 312000,
+        avg_speed: 18.3,
+        rush_hour_impact: -42.1,
+        status: "active"
+      },
+      {
+        id: "london",
+        name: "London", 
+        country: "UK",
+        center: [51.5074, -0.1278] as [number, number],
+        timezone: "Europe/London",
+        segments: 380,
+        traffic_records: 245000,
+        avg_speed: 20.1,
+        rush_hour_impact: -38.5,
+        status: "active"
+      }
+    ];
+    
+    setCities(mockCities);
+    
+    // Calculate aggregated metrics from mock data
+    const totalSegments = mockCities.reduce((sum, city) => sum + city.segments, 0);
+    const totalRecords = mockCities.reduce((sum, city) => sum + city.traffic_records, 0);
+    const avgSpeed = mockCities.reduce((sum, city) => sum + city.avg_speed, 0) / mockCities.length;
+    
+    setMetrics(prev => ({
+      ...prev,
+      totalSegments,
+      totalRecords,
+      avgSpeed: Number(avgSpeed.toFixed(1))
+    }));
+
+    // Generate mock predictions
+    const mockPredictions = [];
+    const cityIds = ["san_francisco", "new_york", "london"];
+    
+    for (let i = 0; i < 25; i++) {
+      const cityId = cityIds[i % cityIds.length];
+      const baseSpeed = cityId === "san_francisco" ? 24.5 : cityId === "new_york" ? 18.3 : 20.1;
+      const currentHour = new Date().getHours();
+      const isRushHour = currentHour >= 7 && currentHour <= 9 || currentHour >= 17 && currentHour <= 19;
+      
+      mockPredictions.push({
+        city: cityId,
+        segment_id: i + 1,
+        timestamp: new Date(Date.now() + Math.random() * 7200000).toISOString(),
+        predicted_speed: Math.max(5, baseSpeed + (Math.random() - 0.5) * 10 + (isRushHour ? -8 : 0)),
+        confidence_lower: Math.max(5, baseSpeed - 5),
+        confidence_upper: Math.min(50, baseSpeed + 5), 
+        is_rush_hour: isRushHour,
+        lat: 37.7749 + (Math.random() - 0.5) * 0.1,
+        lon: -122.4194 + (Math.random() - 0.5) * 0.1
+      });
+    }
+    
+    setPredictions(mockPredictions);
+  };
 
   // Load city data from API
   const loadCityData = async () => {
@@ -291,7 +372,61 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedCity }) => {
       }
     } catch (error) {
       console.error('Error loading city data:', error);
-      setApiStatus('error');
+      setApiStatus('offline');
+      
+      // Load fallback mock data when API is unavailable
+      const mockCities: City[] = [
+        {
+          id: "san_francisco",
+          name: "San Francisco",
+          country: "USA",
+          center: [37.7749, -122.4194] as [number, number],
+          timezone: "America/Los_Angeles",
+          segments: 250,
+          traffic_records: 180000,
+          avg_speed: 24.5,
+          rush_hour_impact: -35.2,
+          status: "active"
+        },
+        {
+          id: "new_york", 
+          name: "New York",
+          country: "USA",
+          center: [40.7128, -74.0060] as [number, number],
+          timezone: "America/New_York",
+          segments: 420,
+          traffic_records: 312000,
+          avg_speed: 18.3,
+          rush_hour_impact: -42.1,
+          status: "active"
+        },
+        {
+          id: "london",
+          name: "London", 
+          country: "UK",
+          center: [51.5074, -0.1278] as [number, number],
+          timezone: "Europe/London",
+          segments: 380,
+          traffic_records: 245000,
+          avg_speed: 20.1,
+          rush_hour_impact: -38.5,
+          status: "active"
+        }
+      ];
+      
+      setCities(mockCities);
+      
+      // Calculate aggregated metrics from mock data
+      const totalSegments = mockCities.reduce((sum, city) => sum + city.segments, 0);
+      const totalRecords = mockCities.reduce((sum, city) => sum + city.traffic_records, 0);
+      const avgSpeed = mockCities.reduce((sum, city) => sum + city.avg_speed, 0) / mockCities.length;
+      
+      setMetrics(prev => ({
+        ...prev,
+        totalSegments,
+        totalRecords,
+        avgSpeed: Number(avgSpeed.toFixed(1))
+      }));
     }
   };
 
@@ -305,6 +440,31 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedCity }) => {
       }
     } catch (error) {
       console.error('Error loading predictions:', error);
+      
+      // Generate mock predictions when API is unavailable
+      const mockPredictions = [];
+      const cityIds = ["san_francisco", "new_york", "london"];
+      
+      for (let i = 0; i < 25; i++) {
+        const cityId = cityIds[i % cityIds.length];
+        const baseSpeed = cityId === "san_francisco" ? 24.5 : cityId === "new_york" ? 18.3 : 20.1;
+        const currentHour = new Date().getHours();
+        const isRushHour = currentHour >= 7 && currentHour <= 9 || currentHour >= 17 && currentHour <= 19;
+        
+        mockPredictions.push({
+          city: cityId,
+          segment_id: i + 1,
+          timestamp: new Date(Date.now() + Math.random() * 7200000).toISOString(),
+          predicted_speed: Math.max(5, baseSpeed + (Math.random() - 0.5) * 10 + (isRushHour ? -8 : 0)),
+          confidence_lower: Math.max(5, baseSpeed - 5),
+          confidence_upper: Math.min(50, baseSpeed + 5), 
+          is_rush_hour: isRushHour,
+          lat: 37.7749 + (Math.random() - 0.5) * 0.1,
+          lon: -122.4194 + (Math.random() - 0.5) * 0.1
+        });
+      }
+      
+      setPredictions(mockPredictions);
     }
   };
 
@@ -325,19 +485,69 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedCity }) => {
     }
   };
 
+  // Load analytics data
+  const loadAnalyticsData = async () => {
+    try {
+      console.log('Dashboard: Loading analytics data...');
+      
+      // Load metrics
+      const metricsResponse = await fetch(`${API_BASE}/analytics/metrics`);
+      if (metricsResponse.ok) {
+        const metricsData = await metricsResponse.json();
+        console.log('Dashboard: Loaded metrics:', metricsData);
+        
+        setMetrics(prev => ({
+          ...prev,
+          accuracy: metricsData.accuracy || prev.accuracy,
+          totalRecords: metricsData.total_predictions || prev.totalRecords
+        }));
+      }
+      
+      // Load historical data for charts
+      const historicalResponse = await fetch(`${API_BASE}/analytics/historical?hours=24`);
+      if (historicalResponse.ok) {
+        const historicalData = await historicalResponse.json();
+        console.log('Dashboard: Loaded historical data:', historicalData.length, 'records');
+        // Store historical data for charts (will be used by chart components)
+      }
+      
+    } catch (error) {
+      console.error('Dashboard: Error loading analytics data:', error);
+    }
+  };
+
   useEffect(() => {
     const initializeData = async () => {
       setIsLoading(true);
+      console.log('Dashboard: Initializing data...');
+      
       const isHealthy = await checkApiHealth();
+      console.log('Dashboard: API health check result:', isHealthy);
+      
       if (isHealthy) {
+        console.log('Dashboard: Loading data from API...');
         await loadCityData();
         await loadPredictions();
+        await loadAnalyticsData();
+      } else {
+        console.log('Dashboard: API not healthy, falling back to mock data');
+        initializeMockData();
       }
       setIsLoading(false);
     };
     
     initializeData();
-  }, []);
+    
+    // Set up real-time updates
+    const interval = setInterval(async () => {
+      if (apiStatus === 'healthy') {
+        await loadPredictions();
+        await loadAnalyticsData();
+      }
+    }, 10000); // Update every 10 seconds
+    
+    return () => clearInterval(interval);
+  }, [apiStatus]);
 
   // Filter data based on selected city
   const getFilteredMetrics = () => {
@@ -415,7 +625,7 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedCity }) => {
       </Box>
 
       <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <MetricCard
             title="Average Speed"
             value={`${filteredMetrics.avgSpeed.toFixed(1)} mph`}
@@ -425,7 +635,7 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedCity }) => {
             isLoading={isLoading}
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <MetricCard
             title={selectedCity === 'all' ? 'Total Segments' : 'Road Segments'}
             value={filteredMetrics.totalSegments.toLocaleString()}
@@ -435,7 +645,7 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedCity }) => {
             isLoading={isLoading}
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <MetricCard
             title="Traffic Records"
             value={filteredMetrics.totalRecords > 1000 ? `${(filteredMetrics.totalRecords/1000).toFixed(0)}K` : filteredMetrics.totalRecords.toLocaleString()}
@@ -445,7 +655,7 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedCity }) => {
             isLoading={isLoading}
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <MetricCard
             title="Model Accuracy"
             value={`${filteredMetrics.accuracy.toFixed(1)}%`}
@@ -458,7 +668,7 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedCity }) => {
       </Grid>
 
       <Grid container spacing={3}>
-        <Grid item xs={12} lg={8}>
+        <Grid size={{ xs: 12, lg: 8 }}>
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -467,7 +677,7 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedCity }) => {
             <RealTimeChart />
           </motion.div>
         </Grid>
-        <Grid item xs={12} lg={4}>
+        <Grid size={{ xs: 12, lg: 4 }}>
           <StatusCard 
             apiStatus={apiStatus}
             selectedCity={selectedCity}
@@ -477,7 +687,7 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedCity }) => {
       </Grid>
 
       <Grid container spacing={3} sx={{ mt: 2 }}>
-        <Grid item xs={12}>
+        <Grid size={12}>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

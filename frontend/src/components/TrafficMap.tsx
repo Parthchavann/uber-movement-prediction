@@ -247,8 +247,9 @@ const MockMapComponent: React.FC<{
 
 const SegmentDetails: React.FC<{
   segment: any;
+  selectedCity: string;
   onClose: () => void;
-}> = ({ segment, onClose }) => {
+}> = ({ segment, selectedCity, onClose }) => {
   const theme = useTheme();
   
   if (!segment) return null;
@@ -429,15 +430,18 @@ const TrafficMap: React.FC<TrafficMapProps> = ({ selectedCity = 'all' }) => {
   const [segments, setSegments] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   
-  const API_BASE = 'http://localhost:8001';
+  const API_BASE = 'http://localhost:8002';
   
   // Load traffic data from API
   const loadTrafficData = async () => {
     try {
       setIsLoading(true);
+      console.log('TrafficMap: Loading data from API...');
       const response = await fetch(`${API_BASE}/predictions`);
+      console.log('TrafficMap: API response status:', response.status);
       if (response.ok) {
         const predictions = await response.json();
+        console.log('TrafficMap: Loaded predictions:', predictions.length);
         
         // Filter by selected city and convert to segments format
         let filteredPredictions = predictions;
@@ -446,7 +450,7 @@ const TrafficMap: React.FC<TrafficMapProps> = ({ selectedCity = 'all' }) => {
         }
         
         // Convert predictions to segment format for map display
-        const segmentMap = new Map();
+        const segmentMap: Map<string, any> = new (Map as any)();
         filteredPredictions.forEach((pred: any) => {
           const key = `${pred.city}_${pred.segment_id}`;
           if (!segmentMap.has(key)) {
@@ -464,13 +468,37 @@ const TrafficMap: React.FC<TrafficMapProps> = ({ selectedCity = 'all' }) => {
         setSegments(Array.from(segmentMap.values()).slice(0, 20)); // Limit for display
       }
     } catch (error) {
-      console.error('Error loading traffic data:', error);
-      // Fallback to mock data
-      setSegments([
-        { id: 0, city: selectedCity, speed: 24.8, prediction: 26.1, lat: 37.7749, lon: -122.4194 },
-        { id: 1, city: selectedCity, speed: 18.3, prediction: 19.7, lat: 37.7849, lon: -122.4094 },
-        { id: 2, city: selectedCity, speed: 31.2, prediction: 29.8, lat: 37.7649, lon: -122.4294 },
-      ]);
+      console.error('TrafficMap: Error loading traffic data:', error);
+      console.log('TrafficMap: Falling back to mock data');
+      // Fallback to comprehensive mock data
+      const mockSegments = [];
+      const cityData: Record<string, { center: [number, number]; baseSpeed: number }> = {
+        san_francisco: { center: [37.7749, -122.4194], baseSpeed: 24.8 },
+        new_york: { center: [40.7128, -74.0060], baseSpeed: 18.3 },
+        london: { center: [51.5074, -0.1278], baseSpeed: 20.1 },
+        all: { center: [37.7749, -122.4194], baseSpeed: 21.0 }
+      };
+      
+      const cityInfo = cityData[selectedCity] || cityData.all;
+      const [baseLat, baseLon] = cityInfo.center;
+      
+      for (let i = 0; i < 15; i++) {
+        const currentHour = new Date().getHours();
+        const isRushHour = currentHour >= 7 && currentHour <= 9 || currentHour >= 17 && currentHour <= 19;
+        const speedVariation = (Math.random() - 0.5) * 15;
+        const rushHourPenalty = isRushHour ? Math.random() * 8 : 0;
+        
+        mockSegments.push({
+          id: i,
+          city: selectedCity,
+          speed: Math.max(5, Math.min(55, cityInfo.baseSpeed + speedVariation - rushHourPenalty)),
+          prediction: Math.max(5, Math.min(55, cityInfo.baseSpeed + speedVariation + (Math.random() - 0.5) * 3)),
+          lat: baseLat + (Math.random() - 0.5) * 0.02,
+          lon: baseLon + (Math.random() - 0.5) * 0.02
+        });
+      }
+      
+      setSegments(mockSegments);
     } finally {
       setIsLoading(false);
     }
@@ -485,9 +513,15 @@ const TrafficMap: React.FC<TrafficMapProps> = ({ selectedCity = 'all' }) => {
   useEffect(() => {
     const interval = setInterval(() => {
       loadTrafficData();
-    }, 30000); // Update every 30 seconds
+    }, 15000); // Update every 15 seconds for more real-time feel
 
     return () => clearInterval(interval);
+  }, []);
+
+  // Separate effect for initial load when city changes
+  useEffect(() => {
+    console.log('TrafficMap: City changed to:', selectedCity);
+    loadTrafficData();
   }, [selectedCity]);
 
   const handleMapTypeChange = (event: React.MouseEvent<HTMLElement>, newType: string) => {
@@ -623,6 +657,7 @@ const TrafficMap: React.FC<TrafficMapProps> = ({ selectedCity = 'all' }) => {
               {selectedSegmentData && (
                 <SegmentDetails
                   segment={selectedSegmentData}
+                  selectedCity={selectedCity}
                   onClose={() => setSelectedSegment(null)}
                 />
               )}

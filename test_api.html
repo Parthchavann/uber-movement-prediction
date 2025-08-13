@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+</head>
+<body>
+    <h1>API Connection Test</h1>
+    <div id="results"></div>
+    
+    <script>
+        async function testAPI() {
+            const results = document.getElementById('results');
+            const apiBase = 'http://localhost:8001';
+            
+            const endpoints = [
+                '/cities',
+                '/predictions', 
+                '/health',
+                '/analytics/metrics',
+                '/traffic/realtime'
+            ];
+            
+            for (const endpoint of endpoints) {
+                try {
+                    const response = await fetch(`${apiBase}${endpoint}`);
+                    const data = await response.json();
+                    
+                    results.innerHTML += `
+                        <h3>${endpoint}</h3>
+                        <p>Status: ${response.status}</p>
+                        <pre>${JSON.stringify(data, null, 2).substring(0, 500)}...</pre>
+                        <hr>
+                    `;
+                } catch (error) {
+                    results.innerHTML += `
+                        <h3>${endpoint}</h3>
+                        <p>Error: ${error.message}</p>
+                        <hr>
+                    `;
+                }
+            }
+        }
+        
+        testAPI();
+    </script>
+</body>
+</html>
