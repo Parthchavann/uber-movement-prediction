@@ -22,6 +22,8 @@ import {
   MenuItem,
   Switch,
   FormControlLabel,
+  ButtonGroup,
+  Button,
 } from '@mui/material';
 import { Grid } from '@mui/material';
 // Removed EnhancedRealTimeChart import - using integrated visualization instead
