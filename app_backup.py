@@ -29,7 +29,6 @@ def health():
     })
 
 @app.route('/api/cities')
-@app.route('/cities')
 def get_cities():
     return jsonify([
         {"id": "san_francisco", "name": "San Francisco", "country": "USA", "segments": 2847},
@@ -38,7 +37,6 @@ def get_cities():
     ])
 
 @app.route('/api/predictions')
-@app.route('/predictions')
 def get_predictions():
     limit = int(request.args.get('limit', 50))
     city = request.args.get('city', 'all')
@@ -61,7 +59,6 @@ def get_predictions():
     return jsonify(predictions)
 
 @app.route('/api/segments')
-@app.route('/segments')
 def get_segments():
     city = request.args.get('city', 'san_francisco')
     segments = []
@@ -79,80 +76,7 @@ def get_segments():
     
     return jsonify(segments)
 
-@app.route('/api/analytics/metrics')
-@app.route('/analytics/metrics')
-def get_metrics():
-    return jsonify({
-        "totalPredictions": random.randint(15000, 25000),
-        "accuracy": round(random.uniform(0.85, 0.92), 3),
-        "avgResponseTime": random.randint(45, 85),
-        "activeSegments": random.randint(2800, 3200),
-        "citiesMonitored": 3,
-        "lastUpdated": datetime.now().isoformat()
-    })
-
-@app.route('/api/analytics/historical')
-@app.route('/analytics/historical')
-def get_historical():
-    hours = int(request.args.get('hours', 24))
-    historical_data = []
-    
-    for i in range(hours):
-        timestamp = datetime.now() - timedelta(hours=i)
-        historical_data.append({
-            "timestamp": timestamp.isoformat(),
-            "avg_speed": round(random.uniform(25, 45), 1),
-            "predictions_made": random.randint(800, 1200),
-            "accuracy": round(random.uniform(0.83, 0.94), 3)
-        })
-    
-    return jsonify(historical_data)
-
-@app.route('/api/traffic/realtime')
-@app.route('/traffic/realtime')
-def get_realtime_traffic():
-    traffic_data = []
-    cities = ['san_francisco', 'new_york', 'london']
-    
-    for city in cities:
-        for i in range(50):
-            speed = round(random.uniform(5, 65), 1)
-            status = 'normal' if speed > 25 else ('congested' if speed > 15 else 'heavy')
-            
-            traffic_data.append({
-                "city": city,
-                "segment_id": i,
-                "current_speed": speed,
-                "timestamp": datetime.now().isoformat(),
-                "status": status,
-                "lat": round(random.uniform(37.7, 40.8), 6),
-                "lon": round(random.uniform(-122.5, -73.9), 6)
-            })
-    
-    return jsonify(traffic_data)
-
-@app.route('/api/models/status')
-@app.route('/models/status')
-def get_model_status():
-    return jsonify({
-        "lstm": {
-            "status": "ready",
-            "accuracy": 0.87,
-            "last_trained": (datetime.now() - timedelta(days=2)).isoformat(),
-            "predictions_today": random.randint(8000, 12000)
-        },
-        "gnn": {
-            "status": "ready", 
-            "accuracy": 0.89,
-            "last_trained": (datetime.now() - timedelta(days=1)).isoformat(),
-            "predictions_today": random.randint(9000, 13000)
-        },
-        "active_model": "lstm",
-        "total_predictions": random.randint(17000, 25000)
-    })
-
 @app.route('/api/realtime')
-@app.route('/realtime')
 def get_realtime():
     return jsonify({
         "timestamp": datetime.now().isoformat(),

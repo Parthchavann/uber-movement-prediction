@@ -24,9 +24,13 @@ venv/
 .env*
 !.env.example
 
-# Large data files
-data/
-models/
+# Large data files (but keep directory structure)
+data/*.csv
+data/*.json
+data/*.parquet
+models/*.h5
+models/*.pkl
+models/*.pt
 *.zip
 *.tar.gz
 

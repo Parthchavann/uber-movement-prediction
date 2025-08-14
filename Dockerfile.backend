@@ -1,26 +1,20 @@
-# Backend API Dockerfile
+# Backend API Dockerfile - Simplified for Mock API
 FROM python:3.12-slim
 
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies
+# Install only essential dependencies
 RUN apt-get update && apt-get install -y \
-    gcc \
-    g++ \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements and install Python dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Install minimal Python dependencies for mock API
+RUN pip install --no-cache-dir \
+    fastapi==0.104.1 \
+    uvicorn==0.24.0
 
-# Copy application code
-COPY src/ ./src/
-COPY config/ ./config/
-COPY models/ ./models/
-COPY data/ ./data/
-COPY scripts/ ./scripts/
+# Copy mock API
 COPY mock_api_complete.py .
 
 # Create non-root user
