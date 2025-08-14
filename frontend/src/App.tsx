@@ -56,6 +56,7 @@ import './App.css';
 // Import components
 import Dashboard from './components/Dashboard';
 import EnhancedDashboardWithFilters from './components/EnhancedDashboardWithFilters';
+import EnhancedAdvancedAnalytics from './components/EnhancedAdvancedAnalytics';
 import TrafficMap from './components/TrafficMap';
 import { exportAsJSON, exportAsCSV, exportSummary, ExportData } from './utils/exportUtils';
 
@@ -222,7 +223,7 @@ function App() {
       case 'map':
         return <TrafficMap selectedCity={selectedCity} />;
       case 'enhanced':
-        return <EnhancedDashboardWithFilters selectedCity={selectedCity} />;
+        return <EnhancedAdvancedAnalytics />;
       default:
         return <Dashboard selectedCity={selectedCity} />;
     }
