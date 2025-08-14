@@ -36,11 +36,16 @@
     "start:3003": "set PORT=3003 && set BROWSER=none && react-scripts start",
     "start:dev": "set PORT=3001 && set BROWSER=none && react-scripts start",
     "build": "react-scripts build",
+    "build:production": "GENERATE_SOURCEMAP=false react-scripts build",
     "build:analyze": "npm run build && npx source-map-explorer 'build/static/js/*.js'",
     "test": "react-scripts test",
     "test:coverage": "react-scripts test --coverage --watchAll=false",
+    "test:ci": "react-scripts test --coverage --watchAll=false --ci",
+    "lint": "eslint src/**/*.{js,jsx,ts,tsx}",
+    "lint:fix": "eslint src/**/*.{js,jsx,ts,tsx} --fix",
     "eject": "react-scripts eject",
-    "preview": "npm run build && npx serve -s build -l 3001"
+    "preview": "npm run build && npx serve -s build -l 3001",
+    "serve:production": "npx serve -s build -l 80"
   },
   "eslintConfig": {
     "extends": [

@@ -1,4 +1,48 @@
-# 🚀 UberFlow Analytics - Free Deployment Guide
+# 🚀 UberFlow Analytics - Deployment Guide
+
+## Docker Deployment (Recommended for Production)
+
+### Quick Start with Docker
+
+```bash
+# 1. Clone repository
+git clone https://github.com/Parthchavann/uber-movement-prediction.git
+cd uber-movement-prediction
+
+# 2. Setup environment
+cp .env.example .env
+
+# 3. Deploy with Docker
+chmod +x deploy.sh
+./deploy.sh local
+```
+
+### Access Points
+- **Frontend**: http://localhost:80
+- **Backend API**: http://localhost:8000  
+- **API Documentation**: http://localhost:8000/docs
+- **Monitoring**: http://localhost:9090 (optional)
+
+### Manual Docker Commands
+
+```bash
+# Build and start services
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop services  
+docker-compose down
+
+# Health checks
+curl http://localhost:8000/health
+curl http://localhost:80/health
+```
+
+---
+
+# Alternative: Free Cloud Deployment
 
 ## Quick Start (Recommended): Railway Deployment
 
