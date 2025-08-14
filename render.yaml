@@ -1,0 +1,18 @@
+services:
+  # Full-Stack Application (Frontend + Backend combined)
+  - type: web
+    name: uberflow-analytics
+    env: python
+    plan: free
+    buildCommand: |
+      pip install -r requirements-fullstack.txt &&
+      cd frontend && 
+      npm ci && 
+      npm run build
+    startCommand: gunicorn app:app
+    healthCheckPath: /api/health
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: REACT_APP_API_URL
+        value: ""
