@@ -158,7 +158,7 @@ PERFORMANCE STATISTICS
 
 DATA SOURCE
 ----------
-• API Endpoint: http://localhost:8002
+• API Endpoint: http://localhost:8000
 • Data Format: Real-time predictions with confidence intervals
 • Update Frequency: Every 10-15 seconds
 • Powered by LSTM and GNN models

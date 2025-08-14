@@ -104,7 +104,7 @@ const RealTimeChart: React.FC = () => {
   const loadHistoricalData = async () => {
     try {
       console.log('RealTimeChart: Loading historical data...');
-      const response = await fetch('http://localhost:8002/analytics/historical?hours=24');
+      const response = await fetch('http://localhost:8000/analytics/historical?hours=24');
       
       if (response.ok) {
         const historicalData = await response.json();

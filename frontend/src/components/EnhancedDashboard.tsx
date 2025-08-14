@@ -127,7 +127,7 @@ const EnhancedDashboard: React.FC = () => {
   const [notifications, setNotifications] = useState<any[]>([]);
   const [settingsOpen, setSettingsOpen] = useState(false);
 
-  const API_BASE = 'http://localhost:8002';
+  const API_BASE = 'http://localhost:8000';
 
   // Enhanced API calls with error handling and caching
   const fetchWithRetry = async (url: string, retries = 3): Promise<any> => {

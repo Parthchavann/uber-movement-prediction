@@ -52,7 +52,7 @@ export interface RealtimeTraffic {
 }
 
 class DataService {
-  private baseUrl = 'http://localhost:8002';
+  private baseUrl = 'http://localhost:8000';
   private cache = new Map<string, { data: any; timestamp: number }>();
   private cacheTimeout = 5 * 60 * 1000; // 5 minutes
 

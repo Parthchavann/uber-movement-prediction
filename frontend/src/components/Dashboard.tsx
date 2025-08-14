@@ -26,7 +26,7 @@ import {
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import MetricsOverview from './MetricsOverview';
-import RealTimeChart from './RealTimeChart';
+import EnhancedRealTimeChart from './EnhancedRealTimeChart';
 import TrafficMap from './TrafficMap';
 
 interface MetricCardProps {
@@ -263,7 +263,7 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedCity = "san_francisco" })
   const [predictions, setPredictions] = useState<Prediction[]>([]);
   const [apiStatus, setApiStatus] = useState('offline');
 
-  const API_BASE = 'http://localhost:8002';
+  const API_BASE = 'http://localhost:8000';
 
   // Initialize with mock data
   const initializeMockData = () => {
@@ -468,19 +468,12 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedCity = "san_francisco" })
     }
   };
 
-  // Check API health
+  // API health check - simplified without status setting (managed by App.tsx)
   const checkApiHealth = async () => {
     try {
       const response = await fetch(`${API_BASE}/health`);
-      if (response.ok) {
-        setApiStatus('healthy');
-        return true;
-      } else {
-        setApiStatus('error');
-        return false;
-      }
+      return response.ok;
     } catch (error) {
-      setApiStatus('offline');
       return false;
     }
   };
@@ -499,7 +492,9 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedCity = "san_francisco" })
         setMetrics(prev => ({
           ...prev,
           accuracy: metricsData.accuracy || prev.accuracy,
-          totalRecords: metricsData.total_predictions || prev.totalRecords
+          totalRecords: metricsData.total_predictions || metricsData.totalPredictions || prev.totalRecords,
+          totalSegments: metricsData.totalSegments || prev.totalSegments,
+          avgSpeed: metricsData.avgSpeed || prev.avgSpeed
         }));
       }
       
@@ -674,7 +669,7 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedCity = "san_francisco" })
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
           >
-            <RealTimeChart />
+            <EnhancedRealTimeChart />
           </motion.div>
         </Grid>
         <Grid size={{ xs: 12, lg: 4 }}>

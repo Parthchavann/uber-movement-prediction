@@ -430,7 +430,7 @@ const TrafficMap: React.FC<TrafficMapProps> = ({ selectedCity = 'all' }) => {
   const [segments, setSegments] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   
-  const API_BASE = 'http://localhost:8002';
+  const API_BASE = 'http://localhost:8000';
   
   // Load traffic data from API
   const loadTrafficData = async () => {

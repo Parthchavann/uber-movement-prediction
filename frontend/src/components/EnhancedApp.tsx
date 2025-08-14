@@ -197,24 +197,11 @@ const EnhancedApp: React.FC = () => {
   });
 
   // Check API status
-  const checkApiStatus = async () => {
-    try {
-      const response = await fetch('http://localhost:8002/health');
-      if (response.ok) {
-        setApiStatus('healthy');
-      } else {
-        setApiStatus('error');
-      }
-    } catch {
-      setApiStatus('offline');
-    }
-  };
-
+  // Remove duplicate health checking - API status is managed by App.tsx
   // Initialize
   useEffect(() => {
-    checkApiStatus();
-    const interval = setInterval(checkApiStatus, 30000); // Check every 30s
-    return () => clearInterval(interval);
+    // API status will be managed by the parent App component
+    setApiStatus('healthy'); // Initialize as healthy, will be updated by parent
   }, []);
 
   // Handle navigation

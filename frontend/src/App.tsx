@@ -122,17 +122,30 @@ function App() {
   const [notifications, setNotifications] = useState<any[]>([]);
   const [lastUpdate, setLastUpdate] = useState(new Date());
 
-  // Check API status
+  // Check API status with timeout and stable state management
   const checkApiStatus = async () => {
     try {
-      const response = await fetch('http://localhost:8002/health');
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+      
+      const response = await fetch('http://localhost:8000/health', {
+        signal: controller.signal,
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      clearTimeout(timeoutId);
+      
       if (response.ok) {
         const data = await response.json();
+        const currentStatus = apiStatus;
         setApiStatus('healthy');
         setLastUpdate(new Date());
         
         // Add success notification if status changed
-        if (apiStatus !== 'healthy') {
+        if (currentStatus !== 'healthy') {
           setNotifications(prev => [...prev, {
             id: Date.now(),
             type: 'success',
@@ -140,8 +153,9 @@ function App() {
           }]);
         }
       } else {
+        const currentStatus = apiStatus;
         setApiStatus('error');
-        if (apiStatus === 'healthy') {
+        if (currentStatus === 'healthy') {
           setNotifications(prev => [...prev, {
             id: Date.now(),
             type: 'error',
@@ -149,9 +163,15 @@ function App() {
           }]);
         }
       }
-    } catch {
+    } catch (error) {
+      const currentStatus = apiStatus;
+      // Don't change status if it's just a timeout during healthy state
+      if ((error as any).name === 'AbortError' && currentStatus === 'healthy') {
+        return; // Keep current healthy status for timeout errors
+      }
+      
       setApiStatus('offline');
-      if (apiStatus === 'healthy') {
+      if (currentStatus === 'healthy') {
         setNotifications(prev => [...prev, {
           id: Date.now(),
           type: 'warning',
@@ -165,8 +185,8 @@ function App() {
     checkApiStatus();
     setIsLoading(false);
     
-    // Set up real-time health checks
-    const healthInterval = setInterval(checkApiStatus, realTimeMode ? 15000 : 60000);
+    // Set up real-time health checks - reduced frequency to prevent flickering
+    const healthInterval = setInterval(checkApiStatus, realTimeMode ? 30000 : 60000);
     
     return () => clearInterval(healthInterval);
   }, [realTimeMode]);
@@ -228,9 +248,9 @@ function App() {
     try {
       // Fetch current data for export
       const [predictionsRes, citiesRes, metricsRes] = await Promise.allSettled([
-        fetch('http://localhost:8002/predictions?limit=100'),
-        fetch('http://localhost:8002/cities'),
-        fetch('http://localhost:8002/analytics/metrics')
+        fetch('http://localhost:8000/predictions?limit=100'),
+        fetch('http://localhost:8000/cities'),
+        fetch('http://localhost:8000/analytics/metrics')
       ]);
 
       const exportData: ExportData = {

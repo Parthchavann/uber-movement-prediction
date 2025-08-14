@@ -337,7 +337,7 @@ const EnhancedTrafficMap: React.FC<{
     trafficLevel: 'all'
   });
 
-  const API_BASE = 'http://localhost:8002';
+  const API_BASE = 'http://localhost:8000';
 
   // Load traffic data
   const loadTrafficData = async () => {
