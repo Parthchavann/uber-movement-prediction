@@ -60,6 +60,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 // Import our enhanced components
 import EnhancedDashboard from './EnhancedDashboard';
 import EnhancedTrafficMap from './EnhancedTrafficMap';
+import EnhancedAdvancedAnalytics from './EnhancedAdvancedAnalytics';
 
 interface NavigationItem {
   id: string;
@@ -89,7 +90,7 @@ const navigationItems: NavigationItem[] = [
     id: 'analytics',
     title: 'Advanced Analytics',
     icon: <Analytics />,
-    component: EnhancedDashboard, // Could be a separate component
+    component: EnhancedAdvancedAnalytics,
     description: 'Deep dive analytics and reports',
   },
   {
