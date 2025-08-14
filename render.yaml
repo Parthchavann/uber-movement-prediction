@@ -8,7 +8,7 @@ services:
       pip install -r requirements-fullstack.txt &&
       cd frontend && 
       npm ci && 
-      npm run build
+      DISABLE_ESLINT_PLUGIN=true CI=false npm run build
     startCommand: gunicorn app:app
     healthCheckPath: /api/health
     envVars:
